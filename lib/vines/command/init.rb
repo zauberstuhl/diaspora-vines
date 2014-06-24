@@ -13,7 +13,7 @@ module Vines
         create_directories(dir)
         create_users(domain, dir)
         update_config(domain, dir)
-        Command::Cert.new.create_cert(domain, File.join(dir, 'conf/certs'))
+        Command::Cert.new.create_cert(domain, File.join(dir, 'config/vines'))
 
         puts "Initialized server directory: #{domain}"
         puts "Run 'cd #{domain} && vines start' to begin"
@@ -31,11 +31,11 @@ module Vines
         %w[data log pid].each do |sub|
           Dir.mkdir(File.join(dir, sub), 0700)
         end
-        File.chmod(0600, File.join(dir, 'conf/config.rb'))
+        File.chmod(0600, File.join(dir, 'config/vines.rb'))
       end
 
       def update_config(domain, dir)
-        config = File.expand_path('conf/config.rb', dir)
+        config = File.expand_path('config/vines.rb', dir)
         text = File.read(config, encoding: 'utf-8')
         File.open(config, 'w:utf-8') do |f|
           f.write(text.gsub('wonderland.lit', domain))
