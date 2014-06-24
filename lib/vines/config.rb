@@ -21,7 +21,7 @@ module Vines
     end
 
     def initialize(&block)
-      @certs = File.expand_path('conf/certs')
+      @certs = File.expand_path('config/vines')
       @vhosts, @ports, @cluster = {}, {}, nil
       @null = Storage::Null.new
       @router = Router.new(self)

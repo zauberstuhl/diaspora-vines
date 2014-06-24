@@ -11,7 +11,7 @@ Vines::Config.configure do
   # Set the directory in which to look for virtual hosts' TLS certificates.
   # This is optional and defaults to the conf/certs directory created during
   # `vines init`.
-  certs 'conf/certs'
+  certs 'config/vines'
 
   # Each host element below is a virtual host domain name that this server will
   # service. Hosts can share storage configurations or use separate databases.
