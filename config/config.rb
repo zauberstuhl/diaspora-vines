@@ -48,8 +48,14 @@ Vines::Config.configure do
   host 'wonderland.lit' do
     cross_domain_messages false
     private_storage false
-    storage 'fs' do
-      dir 'data'
+    storage 'diaspora' do
+      adapter 'postgresql'
+      host 'localhost'
+      port 5432
+      database 'diaspora_production'
+      username ''
+      password ''
+      pool 5
     end
     # components 'tea'  => 'secr3t',
     #            'cake' => 'passw0rd'
