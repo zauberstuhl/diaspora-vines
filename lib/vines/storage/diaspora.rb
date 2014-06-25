@@ -3,7 +3,7 @@ require 'active_record'
 module Vines
   class Storage
     class Diaspora < Storage
-      register :sql
+      register :diaspora
 
       class Contact < ActiveRecord::Base
         belongs_to :user
