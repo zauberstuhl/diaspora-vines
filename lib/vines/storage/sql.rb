@@ -2,8 +2,8 @@ require 'active_record'
 
 module Vines
   class Storage
-    class Diaspora < Storage
-      register :diaspora
+    class Sql < Storage
+      register :sql
 
       class Contact < ActiveRecord::Base
         belongs_to :user
@@ -70,6 +70,13 @@ module Vines
         end if xuser
       end
       with_connection :find_user
+
+      def authenticate(username, password)
+        user = find_user(username)
+        dbhash = BCrypt::Password.new(user.password) rescue nil
+        hash = BCrypt::Engine.hash_secret("#{password}#{@config.pepper}", bcrypt.salt) rescue nil
+        ((hash && dbhash) && hash == dbhash)? user : nil
+      end
 
       def save_user(user)
         #xuser = user_by_jid(user.jid) || Diaspora::User.new(jid: user.jid.bare.to_s)
@@ -200,27 +207,27 @@ module Vines
       private
 
       def establish_connection
-        ActiveRecord::Base.logger = Logger.new('/dev/null')
+        ActiveRecord::Base.logger = Logger.new('/tmp/sql-logger.log')
         ActiveRecord::Base.establish_connection(@config)
         # has_and_belongs_to_many requires a connection so configure the
         # associations here rather than in the class definitions above.
-        Diaspora::Contact.has_and_belongs_to_many :groups
-        Diaspora::Group.has_and_belongs_to_many :contacts
+        #Sql::Contact.has_and_belongs_to_many :groups
+        #Sql::Group.has_and_belongs_to_many :contacts
       end
 
       def user_by_jid(jid)
         name = JID.new(jid).node
-        Diaspora::User.find_by_username(name).first
+        Sql::User.find_by_username(name)
       end
 
       def fragment_by_jid(jid, node)
         jid = JID.new(jid).bare.to_s
         clause = 'user_id=(select id from users where jid=?) and root=? and namespace=?'
-        Diaspora::Fragment.where(clause, jid, node.name, node.namespace.href).first
+        Sql::Fragment.where(clause, jid, node.name, node.namespace.href).first
       end
 
       def groups(contact)
-        contact.groups.map {|name| Diaspora::Group.find_or_create_by_name(name.strip) }
+        contact.groups.map {|name| Sql::Group.find_or_create_by_name(name.strip) }
       end
     end
   end

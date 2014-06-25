@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
 
   s.add_dependency 'bcrypt', '~> 3.1'
+  s.add_dependency 'devise', '~> 3.2.4'
   s.add_dependency 'em-hiredis', '~> 0.1.1'
   s.add_dependency 'eventmachine', '~> 1.0.3'
   s.add_dependency 'http_parser.rb', '~> 0.5.3'
