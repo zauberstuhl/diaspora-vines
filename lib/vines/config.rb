@@ -37,6 +37,10 @@ module Vines
       dir ? @certs = File.expand_path(dir) : @certs
     end
 
+    def pepper(pepper=nil)
+      @pepper = pepper ? pepper : ""
+    end
+
     def host(*names, &block)
       names = names.flatten.map {|name| name.downcase }
       dupes = names.uniq.size != names.size || (@vhosts.keys & names).any?

@@ -74,7 +74,7 @@ module Vines
       def authenticate(username, password)
         user = find_user(username)
         dbhash = BCrypt::Password.new(user.password) rescue nil
-        hash = BCrypt::Engine.hash_secret("#{password}#{@config.pepper}", bcrypt.salt) rescue nil
+        hash = BCrypt::Engine.hash_secret("#{password}#{@pepper}", bcrypt.salt) rescue nil
         ((hash && dbhash) && hash == dbhash)? user : nil
       end
 
