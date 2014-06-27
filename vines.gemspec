@@ -1,7 +1,7 @@
 require './lib/vines/version'
 
 Gem::Specification.new do |s|
-  s.name         = 'vines'
+  s.name         = 'diaspora-vines'
   s.version      = Vines::VERSION
   s.summary      = %q[Vines is an XMPP chat server that's easy to install and run.]
   s.description  = %q[Vines is an XMPP chat server that supports thousands of simultaneous connections, using EventMachine and Nokogiri.]
