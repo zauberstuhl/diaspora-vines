@@ -21,6 +21,7 @@ module Vines
     end
 
     def initialize(&block)
+      @pepper = ""
       @certs = File.expand_path('config/vines')
       @vhosts, @ports, @cluster = {}, {}, nil
       @null = Storage::Null.new
@@ -38,7 +39,7 @@ module Vines
     end
 
     def pepper(pepper=nil)
-      @pepper = pepper ? pepper : ""
+      pepper ? @pepper = pepper : @pepper
     end
 
     def host(*names, &block)
