@@ -6,15 +6,13 @@ module Vines
       register :sql
 
       class Contact < ActiveRecord::Base
-        belongs_to :user
+        #belongs_to :user
       end
-      class Fragment < ActiveRecord::Base
-        belongs_to :user
-      end
-      class Group < ActiveRecord::Base; end
       class User < ActiveRecord::Base
-        has_many :contacts,  :dependent => :destroy
-        has_many :fragments, :dependent => :delete_all
+        #has_many :contacts
+        #has_many :aspects, :order => 'order_id ASC'
+        #has_many :aspect_memberships, :through => :aspects
+        #has_many :fragments, :dependent => :delete_all
       end
 
       # Wrap the method with ActiveRecord connection pool logic, so we properly
@@ -57,15 +55,17 @@ module Vines
         return if jid.empty?
         xuser = user_by_jid(jid)
         return Vines::User.new(jid: jid).tap do |user|
-          user.name, user.password = xuser.username, xuser.encrypted_password
+          user.name, user.password = xuser.username, xuser.authentication_token
           #xuser.contacts.each do |contact|
-          #  groups = contact.groups.map {|group| group.name }
+            #contact.
+            ##  log.debug("contact IDIDIDIDID: #{contact.person_id}")
+            ##  groups = contact.groups.map {|group| group.name }
           #  user.roster << Vines::Contact.new(
-          #    jid: contact.jid,
-          #    name: contact.name,
-          #    subscription: contact.subscription,
-          #    ask: contact.ask,
-          #    groups: groups)
+          #    jid: 'test2@localhost',
+          #    name: 'test2',
+          #    subscription: "both",
+          #    ask: nil,
+          #    groups: [])
           #end
         end if xuser
       end
@@ -73,161 +73,47 @@ module Vines
 
       def authenticate(username, password)
         user = find_user(username)
-        dbhash = BCrypt::Password.new(user.password) rescue nil
-        hash = BCrypt::Engine.hash_secret("#{password}#{Config.instance.pepper}", dbhash.salt) rescue nil
-        ((hash && dbhash) && hash == dbhash)? user : nil
+        ((password && user.password) && password == user.password) ? user : nil
       end
 
       def save_user(user)
-        #xuser = user_by_jid(user.jid) || Diaspora::User.new(jid: user.jid.bare.to_s)
-        #xuser.name = user.name
-        #xuser.password = user.password
-
-        # remove deleted contacts from roster
-        #xuser.contacts.delete(xuser.contacts.select do |contact|
-        #  !user.contact?(contact.jid)
-        #end)
-
-        # update contacts
-        #xuser.contacts.each do |contact|
-        #  fresh = user.contact(contact.jid)
-        #  contact.update_attributes(
-        #    name: fresh.name,
-        #    ask: fresh.ask,
-        #    subscription: fresh.subscription,
-        #    groups: groups(fresh))
-        #end
-
-        # add new contacts to roster
-        #jids = xuser.contacts.map {|c| c.jid }
-        #user.roster.select {|contact| !jids.include?(contact.jid.bare.to_s) }
-        #  .each do |contact|
-        #    xuser.contacts.build(
-        #      user: xuser,
-        #      jid: contact.jid.bare.to_s,
-        #      name: contact.name,
-        #      ask: contact.ask,
-        #      subscription: contact.subscription,
-        #      groups: groups(contact))
-        #  end
-        #xuser.save
-        p "You cannot save a user via XMPP server!"
+        # do nothing
+        log.error("You cannot save a user via XMPP server!")
       end
       with_connection :save_user
 
       def find_vcard(jid)
-        jid = JID.new(jid).bare.to_s
-        return if jid.empty?
-        # no vcard support yet
-        #if xuser = user_by_jid(jid)
-        #  Nokogiri::XML(xuser.vcard).root rescue nil
-        #end
+        # do nothing
         nil
       end
       with_connection :find_vcard
 
       def save_vcard(jid, card)
-        xuser = user_by_jid(jid)
-        # no vcard support yet
-        #if xuser
-        #  xuser.vcard = card.to_xml
-        #  xuser.save
-        #end
+        # do nothing
       end
       with_connection :save_vcard
 
       def find_fragment(jid, node)
-        jid = JID.new(jid).bare.to_s
-        return if jid.empty?
-        # I have to less xmpp skills what is a fragment?!
-        #if fragment = fragment_by_jid(jid, node)
-        #  Nokogiri::XML(fragment.xml).root rescue nil
-        #end
+        # do nothing
         nil
       end
       with_connection :find_fragment
 
       def save_fragment(jid, node)
-        jid = JID.new(jid).bare.to_s
-        # I have to less xmpp skills what is a fragment?!
-        #fragment = fragment_by_jid(jid, node) ||
-        #  Diaspora::Fragment.new(
-        #    user: user_by_jid(jid),
-        #    root: node.name,
-        #    namespace: node.namespace.href)
-        #fragment.xml = node.to_xml
-        #fragment.save
+        # do nothing
       end
       with_connection :save_fragment
-
-      # Create the tables and indexes used by this storage engine.
-      def create_schema(args={})
-        #args[:force] ||= false
-
-        #ActiveRecord::Schema.define do
-        #  create_table :users, force: args[:force] do |t|
-        #    t.string :jid,      limit: 512, null: false
-        #    t.string :name,     limit: 256, null: true
-        #    t.string :password, limit: 256, null: true
-        #    t.text   :vcard,    null: true
-        #  end
-        #  add_index :users, :jid, unique: true
-
-        #  create_table :contacts, force: args[:force] do |t|
-        #    t.integer :user_id,      null: false
-        #    t.string  :jid,          limit: 512, null: false
-        #    t.string  :name,         limit: 256, null: true
-        #    t.string  :ask,          limit: 128, null: true
-        #    t.string  :subscription, limit: 128, null: false
-        #  end
-        #  add_index :contacts, [:user_id, :jid], unique: true
-
-        #  create_table :groups, force: args[:force] do |t|
-        #    t.string :name, limit: 256, null: false
-        #  end
-        #  add_index :groups, :name, unique: true
-
-        #  create_table :contacts_groups, id: false, force: args[:force] do |t|
-        #    t.integer :contact_id, null: false
-        #    t.integer :group_id,   null: false
-        #  end
-        #  add_index :contacts_groups, [:contact_id, :group_id], unique: true
-
-        #  create_table :fragments, force: args[:force] do |t|
-        #    t.integer :user_id,   null: false
-        #    t.string  :root,      limit: 256, null: false
-        #    t.string  :namespace, limit: 256, null: false
-        #    t.text    :xml,       null: false
-        #  end
-        #  add_index :fragments, [:user_id, :root, :namespace], unique: true
-        #end
-      end
-      #with_connection :create_schema, defer: false
 
       private
 
       def establish_connection
         ActiveRecord::Base.logger = Logger.new('/tmp/sql-logger.log')
         ActiveRecord::Base.establish_connection(@config)
-        # has_and_belongs_to_many requires a connection so configure the
-        # associations here rather than in the class definitions above.
-        #Sql::Contact.has_and_belongs_to_many :groups
-        #Sql::Group.has_and_belongs_to_many :contacts
       end
 
       def user_by_jid(jid)
         name = JID.new(jid).node
         Sql::User.find_by_username(name)
-      end
-
-      def fragment_by_jid(jid, node)
-        jid = JID.new(jid).bare.to_s
-        clause = 'user_id=(select id from users where jid=?) and root=? and namespace=?'
-        Sql::Fragment.where(clause, jid, node.name, node.namespace.href).first
-      end
-
-      def groups(contact)
-        contact.groups.map {|name| Sql::Group.find_or_create_by_name(name.strip) }
       end
     end
   end
