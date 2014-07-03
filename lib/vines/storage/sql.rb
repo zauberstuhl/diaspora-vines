@@ -5,15 +5,7 @@ module Vines
     class Sql < Storage
       register :sql
 
-      class Contact < ActiveRecord::Base
-        #belongs_to :user
-      end
-      class User < ActiveRecord::Base
-        #has_many :contacts
-        #has_many :aspects, :order => 'order_id ASC'
-        #has_many :aspect_memberships, :through => :aspects
-        #has_many :fragments, :dependent => :delete_all
-      end
+      class User < ActiveRecord::Base; end
 
       # Wrap the method with ActiveRecord connection pool logic, so we properly
       # return connections to the pool when we're finished with them. This also
@@ -56,17 +48,6 @@ module Vines
         xuser = user_by_jid(jid)
         return Vines::User.new(jid: jid).tap do |user|
           user.name, user.password = xuser.username, xuser.authentication_token
-          #xuser.contacts.each do |contact|
-            #contact.
-            ##  log.debug("contact IDIDIDIDID: #{contact.person_id}")
-            ##  groups = contact.groups.map {|group| group.name }
-          #  user.roster << Vines::Contact.new(
-          #    jid: 'test2@localhost',
-          #    name: 'test2',
-          #    subscription: "both",
-          #    ask: nil,
-          #    groups: [])
-          #end
         end if xuser
       end
       with_connection :find_user
@@ -105,16 +86,15 @@ module Vines
       with_connection :save_fragment
 
       private
+        def establish_connection
+          ActiveRecord::Base.logger = Logger.new('/tmp/sql-logger.log')
+          ActiveRecord::Base.establish_connection(@config)
+        end
 
-      def establish_connection
-        ActiveRecord::Base.logger = Logger.new('/tmp/sql-logger.log')
-        ActiveRecord::Base.establish_connection(@config)
-      end
-
-      def user_by_jid(jid)
-        name = JID.new(jid).node
-        Sql::User.find_by_username(name)
-      end
+        def user_by_jid(jid)
+          name = JID.new(jid).node
+          Sql::User.find_by_username(name)
+        end
     end
   end
 end
