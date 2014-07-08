@@ -3,12 +3,12 @@ require './lib/vines/version'
 Gem::Specification.new do |s|
   s.name         = 'diaspora-vines'
   s.version      = Vines::VERSION
-  s.summary      = %q[Vines is an XMPP chat server that's easy to install and run.]
-  s.description  = %q[Vines is an XMPP chat server that supports thousands of simultaneous connections, using EventMachine and Nokogiri.]
+  s.summary      = %q[Diaspora-vines is a Vines fork build for diaspora integration.]
+  s.description  = %q[Diaspora-vines is a Vines fork build for diaspora integration. DO NOT use it unless you know what you are doing!]
 
-  s.authors      = ['David Graham']
-  s.email        = %w[david@negativecode.com]
-  s.homepage     = 'http://www.getvines.org'
+  s.authors      = ['Lukas Matt']
+  s.email        = %w[lukas@zauberstuhl.de]
+  s.homepage     = 'http://joindiaspora.com/'
   s.license      = 'MIT'
 
   s.files        = Dir['[A-Z]*', 'vines.gemspec', '{bin,lib,conf,web}/**/*'] - ['Gemfile.lock']
