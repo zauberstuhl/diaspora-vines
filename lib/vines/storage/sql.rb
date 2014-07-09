@@ -22,19 +22,10 @@ module Vines
         defer(method) if deferrable
       end
 
-      %w[adapter host port database username password pool].each do |name|
-        define_method(name) do |*args|
-          if args.first
-            @config[name.to_sym] = args.first
-          else
-            @config[name.to_sym]
-          end
-        end
-      end
+      def initialize(config)
+        # will copy the hash into a new one with the keys symbolized
+        @config = config.inject({}){ |memo,(k,v)| memo[k.to_sym] = v; memo }
 
-      def initialize(&block)
-        @config = {}
-        instance_eval(&block)
         required = [:adapter, :database]
         required << [:host, :port] unless @config[:adapter] == 'sqlite3'
         required.flatten.each {|key| raise "Must provide #{key}" unless @config[key] }
@@ -59,7 +50,7 @@ module Vines
 
       def save_user(user)
         # do nothing
-        log.error("You cannot save a user via XMPP server!")
+        #log.error("You cannot save a user via XMPP server!")
       end
       with_connection :save_user
 

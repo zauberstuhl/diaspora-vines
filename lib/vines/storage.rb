@@ -14,10 +14,10 @@ module Vines
       @@nicks[name.to_sym] = self
     end
 
-    def self.from_name(name, &block)
+    def self.from_name(name, config)
       klass = @@nicks[name.to_sym]
       raise "#{name} storage class not found" unless klass
-      klass.new(&block)
+      klass.new(config)
     end
 
     # Wrap a blocking IO method in a new method that pushes the original method
