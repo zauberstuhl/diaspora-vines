@@ -2,8 +2,8 @@ require 'active_record'
 
 module Vines
   class Storage
-    class Sql < Storage
-      register :sql
+    class Diaspora < Storage
+      register :diaspora
 
       class User < ActiveRecord::Base; end
 
@@ -78,13 +78,13 @@ module Vines
 
       private
         def establish_connection
-          ActiveRecord::Base.logger = Logger.new('/tmp/sql-logger.log')
+          ActiveRecord::Base.logger = Logger.new('/dev/null')
           ActiveRecord::Base.establish_connection(@config)
         end
 
         def user_by_jid(jid)
           name = JID.new(jid).node
-          Sql::User.find_by_username(name)
+          Diaspora::User.find_by_username(name)
         end
     end
   end
