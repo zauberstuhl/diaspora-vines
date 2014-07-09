@@ -35,12 +35,10 @@ module Vines
     #
     # Returns nothing.
     def register_storage
-      %w[couchdb mongodb redis sql].each do |backend|
-        begin
-          require 'vines/storage/%s' % backend
-        rescue LoadError
-          # do nothing
-        end
+      begin
+        require 'vines/storage/diaspora'
+      rescue LoadError
+        # do nothing
       end
     end
 
