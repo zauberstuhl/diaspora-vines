@@ -1,5 +1,7 @@
 # encoding: UTF-8
 
+require 'yaml'
+
 module Vines
 
   # A Config object is passed to the stream handlers to give them access
@@ -21,12 +23,17 @@ module Vines
     end
 
     def initialize(&block)
-      @pepper = ""
-      @certs = File.expand_path('config/vines')
+      @diaspora = YAML.load_file('config/diaspora.yml')
+      @database = YAML.load_file('config/database.yml')
+      raise "diaspora configuration files are missing" unless @diaspora || @database
+
       @vhosts, @ports, @cluster = {}, {}, nil
+
+      @certs = File.expand_path('config/vines')
       @null = Storage::Null.new
       @router = Router.new(self)
       instance_eval(&block)
+
       raise "must define at least one virtual host" if @vhosts.empty?
 
       unless @certs && File.directory?(@certs) && File.readable?(@certs)
@@ -34,21 +41,27 @@ module Vines
       end
     end
 
+    def host(&block)
+      @vhosts[self.domain_name] = Host.new(self, &block)
+    end
+
     def certs(dir=nil)
       dir ? @certs = File.expand_path(dir) : @certs
     end
 
     def pepper(pepper=nil)
-      pepper ? @pepper = pepper : @pepper
+      pepper ? @pepper = pepper : @pepper = ""
     end
 
-    def host(*names, &block)
-      names = names.flatten.map {|name| name.downcase }
-      dupes = names.uniq.size != names.size || (@vhosts.keys & names).any?
-      raise "one host definition per domain allowed" if dupes
-      names.each do |name|
-        @vhosts[name] = Host.new(self, name, &block)
-      end
+    def db_config
+      environment = @diaspora['configuration']['server']['rails_environment']
+      @database[environment]
+    end
+
+    def domain_name
+      @diaspora['configuration']['environment']['url']
+        .gsub(/^http(s){0,1}:\/\/|\/$/, '')
+        .to_s
     end
 
     %w[client server http component].each do |name|

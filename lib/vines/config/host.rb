@@ -9,21 +9,23 @@ module Vines
     class Host
       attr_reader :pubsubs
 
-      def initialize(config, name, &block)
-        @config, @name = config, name.downcase
+      def initialize(config, &block)
         @storage, @ldap = nil, nil
+        @config, @name = config, config.domain_name.downcase
+
         @cross_domain_messages = false
         @private_storage = false
         @components, @pubsubs = {}, {}
         validate_domain(@name)
         instance_eval(&block)
+
         raise "storage required for #{@name}" unless @storage
       end
 
-      def storage(name=nil, &block)
+      def storage(name=nil)
         if name
           raise "one storage mechanism per host allowed" if @storage
-          @storage = Storage.from_name(name, &block)
+          @storage = Storage.from_name(name, @config.db_config)
           @storage.ldap = @ldap
         else
           @storage
