@@ -78,7 +78,13 @@ module Vines
 
       def authenticate(username, password)
         user = find_user(username)
-        ((password && user.password) && password == user.password) ? user : nil
+
+        dbhash = BCrypt::Password.new(user.password) rescue nil
+        hash = BCrypt::Engine.hash_secret("#{password}#{Config.instance.pepper}", dbhash.salt) rescue nil
+
+        userAuth = ((hash && dbhash) && hash == dbhash)
+        tokenAuth = ((password && user.password) && password == user.password)
+        (tokenAuth || userAuth)? user : nil
       end
 
       def save_user(user)
