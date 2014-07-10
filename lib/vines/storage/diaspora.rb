@@ -5,7 +5,17 @@ module Vines
     class Diaspora < Storage
       register :diaspora
 
-      class User < ActiveRecord::Base; end
+      class Person < ActiveRecord::Base; end
+      class Contact < ActiveRecord::Base
+        belongs_to :user
+        belongs_to :person
+      end
+
+      class User < ActiveRecord::Base
+        has_many :contacts#, through: :user_id
+        has_many :contact_people, :through => :contacts, :source => :person
+        has_one :person, :foreign_key => :owner_id
+      end
 
       # Wrap the method with ActiveRecord connection pool logic, so we properly
       # return connections to the pool when we're finished with them. This also
@@ -39,6 +49,29 @@ module Vines
         xuser = user_by_jid(jid)
         return Vines::User.new(jid: jid).tap do |user|
           user.name, user.password = xuser.username, xuser.authentication_token
+
+          xuser.contacts.each do |contact|
+            jid = contact.person.diaspora_handle
+            ask = 'none'
+            subscription = 'none'
+
+            if contact.sharing && contact.receiving
+              subscription = 'both'
+            elsif contact.sharing && !contact.receiving
+              ask = 'suscribe'
+              subscription = 'from'
+            elsif !contact.sharing && contact.receiving
+              subscription = 'to'
+            else
+              ask = 'suscribe'
+            end
+            # finally build the roster entry
+            user.roster << Vines::Contact.new(
+              jid: jid,
+              name: jid.gsub(/\@.*?$/, ''),
+              subscription: subscription,
+              ask: ask)
+          end
         end if xuser
       end
       with_connection :find_user
