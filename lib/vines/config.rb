@@ -61,7 +61,7 @@ module Vines
     def domain_name
       @diaspora['configuration']['environment']['url']
         .gsub(/^http(s){0,1}:\/\/|\/$/, '')
-        .to_s
+        .to_s rescue "localhost"
     end
 
     %w[client server http component].each do |name|

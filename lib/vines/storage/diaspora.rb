@@ -51,7 +51,7 @@ module Vines
           user.name, user.password = xuser.username, xuser.authentication_token
 
           xuser.contacts.each do |contact|
-            jid = contact.person.diaspora_handle
+            handle = contact.person.diaspora_handle
             ask = 'none'
             subscription = 'none'
 
@@ -67,10 +67,11 @@ module Vines
             end
             # finally build the roster entry
             user.roster << Vines::Contact.new(
-              jid: jid,
-              name: jid.gsub(/\@.*?$/, ''),
+              jid: handle,
+              name: handle.gsub(/\@.*?$/, ''),
               subscription: subscription,
-              ask: ask)
+              ask: ask
+            ) if handle
           end
         end if xuser
       end
