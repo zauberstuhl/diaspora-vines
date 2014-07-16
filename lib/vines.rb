@@ -54,6 +54,13 @@ module Vines
   end
 end
 
+begin
+  # try to initialize diaspora AppConfig
+  require "#{Dir.pwd}/config/load_config.rb"
+rescue LoadError
+  puts "Cannot find Diaspora environment! Fallback to vines configuration."
+end
+
 %w[
   base64
   bcrypt

@@ -22,8 +22,6 @@ module Vines
 
     def initialize(&block)
       @certs = File.expand_path('conf/certs')
-      # try to load Diaspora configuration
-      require "#{Dir.pwd}/config/load_config.rb"
       @vhosts, @ports, @cluster = {}, {}, nil
       @null = Storage::Null.new
       @router = Router.new(self)

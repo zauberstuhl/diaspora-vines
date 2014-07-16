@@ -33,8 +33,7 @@ module Vines
       end
 
       def initialize(&block)
-        # try to load Diaspora configuration
-        require "#{Dir.pwd}/config/load_config.rb"
+        raise "You configured diaspora-sql adapter without Diaspora" unless defined? AppConfig
         @config = {
           :adapter => AppConfig.adapter.to_s,
           :database => AppConfig.database.to_s,
