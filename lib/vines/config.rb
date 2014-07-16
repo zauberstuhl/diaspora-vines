@@ -22,6 +22,8 @@ module Vines
 
     def initialize(&block)
       @certs = File.expand_path('conf/certs')
+      # try to load Diaspora configuration
+      require "#{Dir.pwd}/config/load_config.rb"
       @vhosts, @ports, @cluster = {}, {}, nil
       @null = Storage::Null.new
       @router = Router.new(self)
@@ -42,8 +44,22 @@ module Vines
       dupes = names.uniq.size != names.size || (@vhosts.keys & names).any?
       raise "one host definition per domain allowed" if dupes
       names.each do |name|
-        @vhosts[name] = Host.new(self, name, &block)
+        if name.eql? "diaspora"
+          @vhosts[domain_name] = Host.new(self, domain_name, &block)
+        else
+          @vhosts[name] = Host.new(self, name, &block)
+        end
       end
+    end
+
+    def pepper(pepper=nil)
+      pepper ? @pepper = pepper : @pepper = ""
+    end
+
+    def domain_name
+      AppConfig.environment.url
+        .gsub(/^http(s){0,1}:\/\/|\/$/, '')
+        .to_s rescue "localhost"
     end
 
     %w[client server http component].each do |name|

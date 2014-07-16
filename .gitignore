@@ -3,4 +3,5 @@
 .ruby-version
 Gemfile.lock
 pkg
+*.gem
 _site

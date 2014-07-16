@@ -1,5 +1,6 @@
 # encoding: UTF-8
 
 module Vines
-  VERSION = '0.4.8'
+  # vines forked version 0.4.9
+  VERSION = '0.1.0'
 end

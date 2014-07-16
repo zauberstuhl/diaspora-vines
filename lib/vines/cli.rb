@@ -110,7 +110,7 @@ module Vines
       options.tap do |opts|
         opts[:args]    = args
         opts[:command] = command
-        opts[:config]  = File.expand_path('conf/config.rb')
+        opts[:config]  = File.expand_path("#{Dir.pwd}/config/vines.rb") || File.expand_path("conf/config.rb")
         opts[:pid]     = File.expand_path(opts[:pid])
         opts[:log]     = File.expand_path(opts[:log])
       end

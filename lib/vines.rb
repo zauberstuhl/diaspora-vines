@@ -111,6 +111,7 @@ end
   vines/storage
   vines/storage/ldap
   vines/storage/local
+  vines/storage/diaspora
   vines/storage/null
 
   vines/config
