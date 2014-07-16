@@ -27,10 +27,6 @@ module Vines
       @router = Router.new(self)
       instance_eval(&block)
       raise "must define at least one virtual host" if @vhosts.empty?
-
-      unless @certs && File.directory?(@certs) && File.readable?(@certs)
-        raise 'Must provide a readable certs directory'
-      end
     end
 
     def certs(dir=nil)
