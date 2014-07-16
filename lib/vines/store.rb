@@ -42,7 +42,9 @@ module Vines
     def certs
       unless @@sources
         pattern = /-{5}BEGIN CERTIFICATE-{5}\n.*?-{5}END CERTIFICATE-{5}\n/m
-        pairs = Dir[File.join(@dir, '*.crt')].map do |name|
+        files = Dir[File.join(@dir, '*.crt')]
+        files << AppConfig.environment.certificate_authorities if defined?(AppConfig)
+        pairs = files.map do |name|
           File.open(name, "r:UTF-8") do |f|
             pems = f.read.scan(pattern)
             certs = pems.map {|pem| OpenSSL::X509::Certificate.new(pem) }
@@ -77,6 +79,11 @@ module Vines
     def files_for_domain(domain)
       crt = File.expand_path("#{domain}.crt", @dir)
       key = File.expand_path("#{domain}.key", @dir)
+      # diaspora keys will be prioritized
+      if defined?(AppConfig)
+        crt = AppConfig.server.chat.certificate 
+        key = AppConfig.server.chat.key
+      end
       return [crt, key] if File.exists?(crt) && File.exists?(key)
 
       # might be a wildcard cert file
